@@ -1,0 +1,89 @@
+CREATE VIEW vw_Equipment_Reliability_Priority
+AS
+
+WITH ErrorSummary AS
+(
+    SELECT
+        machineID,
+        COUNT(*) AS error_count
+    FROM EquipmentErrors
+    GROUP BY machineID
+),
+FailureMaintenance AS
+(
+    SELECT
+        f.machineID,
+        f.failure AS component,
+        f.datetime AS failure_date,
+        m.datetime AS maintenance_date,
+        DATEDIFF(day, f.datetime, m.datetime) AS days_to_maintenance
+    FROM EquipmentFailures f
+    OUTER APPLY
+    (
+        SELECT TOP 1
+            em.datetime
+        FROM EquipmentMaintenance em
+        WHERE em.machineID = f.machineID
+          AND em.comp = f.failure
+          AND em.datetime > f.datetime
+        ORDER BY em.datetime
+    ) m
+),
+FailureSummary AS
+(
+    SELECT
+        machineID,
+        component,
+        COUNT(*) AS failure_count,
+        COUNT(maintenance_date) AS failures_with_maintenance,
+        AVG(
+            CAST(days_to_maintenance AS DECIMAL(10,2))
+        ) AS avg_days_to_maintenance
+    FROM FailureMaintenance
+    GROUP BY
+        machineID,
+        component
+),
+CandidateSummary AS
+(
+    SELECT
+        f.machineID,
+        f.component,
+        f.failure_count,
+        f.failures_with_maintenance,
+        CAST(
+            f.failures_with_maintenance * 100.0
+            / f.failure_count
+            AS DECIMAL(10,2)
+        ) AS maintenance_coverage_pct,
+        CAST(
+            f.avg_days_to_maintenance
+            AS DECIMAL(10,2)
+        ) AS avg_days_to_maintenance,
+        es.error_count
+    FROM FailureSummary f
+    INNER JOIN ErrorSummary es
+        ON f.machineID = es.machineID
+    WHERE f.failure_count >= 3
+      AND f.avg_days_to_maintenance >= 60
+      AND es.error_count >= 45
+)
+SELECT
+    c.machineID,
+    e.model,
+    e.age,
+    c.component,
+    c.failure_count,
+    c.avg_days_to_maintenance,
+    c.error_count,
+    c.maintenance_coverage_pct,
+    CASE
+        WHEN c.maintenance_coverage_pct < 80
+            THEN 'High Attention'
+        WHEN c.maintenance_coverage_pct < 100
+            THEN 'Monitor'
+        ELSE 'Covered'
+    END AS maintenance_priority
+FROM CandidateSummary c
+INNER JOIN Equipment e
+    ON c.machineID = e.machineID;   
