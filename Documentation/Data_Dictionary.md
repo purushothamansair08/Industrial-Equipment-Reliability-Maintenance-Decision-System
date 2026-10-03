@@ -170,7 +170,7 @@ The core data model is centered around the `Equipment` table.
         ▼                         ▼                         ▼                         ▼
 EquipmentMeasurements      EquipmentErrors          EquipmentMaintenance      EquipmentFailures
     machineID (FK)          machineID (FK)             machineID (FK)             machineID (FK)
-
+```
 ---
 
 ## Relationship Summary
