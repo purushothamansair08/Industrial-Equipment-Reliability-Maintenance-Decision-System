@@ -493,7 +493,7 @@ It demonstrates how industrial event data can be:
 - Aggregation
 - CTEs
 - Complex joins
-- `OUTER APPLY`
+- OUTER APPLY
 - SQL Views
 - Business-rule implementation
 
