@@ -159,22 +159,17 @@ machineID → Equipment(machineID)
 
 The core data model is centered around the `Equipment` table.
 
+## Data Model
+
 ```text
-                         Equipment
-                       machineID (PK)
-                            │
-          ┌─────────────────┼─────────────────┐
-          │                 │                 │
-          ▼                 ▼                 ▼
-EquipmentMeasurements  EquipmentErrors  EquipmentMaintenance
-machineID (FK)         machineID (FK)  machineID (FK)
-          │
-          │
-          └──────────────────────┐
-                                 ▼
-                         EquipmentFailures
-                         machineID (FK)
-```
+                              Equipment
+                            machineID (PK)
+                                  │
+        ┌─────────────────────────┼─────────────────────────┬─────────────────────────┐
+        │                         │                         │                         │
+        ▼                         ▼                         ▼                         ▼
+EquipmentMeasurements      EquipmentErrors          EquipmentMaintenance      EquipmentFailures
+    machineID (FK)          machineID (FK)             machineID (FK)             machineID (FK)
 
 ---
 
