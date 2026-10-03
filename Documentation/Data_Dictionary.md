@@ -40,12 +40,12 @@ machineID
 
 | Column | Data Type | Description |
 |---|---|---|
-| `datetime` | `datetime2` | Date and time of the measurement |
+| `datetime` | `datetime2(7)` | Date and time of the measurement |
 | `machineID` | `tinyint` | Equipment identifier |
-| `volt` | `float` | Voltage measurement |
-| `rotate` | `float` | Rotation measurement |
-| `pressure` | `float` | Pressure measurement |
-| `vibration` | `float` | Vibration measurement |
+| `volt` | `decimal(10,3)` | Voltage measurement |
+| `rotate` | `decimal(10,3)` | Rotation measurement |
+| `pressure` | `decimal(10,3)` | Pressure measurement |
+| `vibration` | `decimal(10,3)` | Vibration measurement |
 
 ### Primary Key
 
